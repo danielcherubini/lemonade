@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/rpc"
 	"os"
+	"strings"
 	"time"
 
 	log "github.com/inconshreveable/log15"
@@ -26,8 +27,13 @@ type client struct {
 }
 
 func New(c *lemon.CLI, logger log.Logger) *client {
+	host := c.Host
+	sshClientEnv, present := os.LookupEnv("SSH_CLIENT")
+	if present {
+		host = strings.Split(sshClientEnv, " ")[0]
+	}
 	return &client{
-		host:               c.Host,
+		host:               host,
 		port:               c.Port,
 		lineEnding:         c.LineEnding,
 		noFallbackMessages: c.NoFallbackMessages,
